@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SAMPLE_CATALOG, searchTracksInCatalog } from './src/utils/musicApi.ts';
+import { fetchLiveMusicSearch, fetchLiveTrending } from './src/services/liveMusicService.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,31 +25,38 @@ async function createServer() {
   });
 
   // ==========================================
-  // SPECIFICATION ENDPOINTS
+  // SPECIFICATION ENDPOINTS (Connected to 100M+ Global CDN)
   // ==========================================
 
   /**
    * B. Trending / Home Feed
    * Method: GET
    * Endpoint: /api/trending
-   * Supports optional query params: ?genre=acoustic&limit=20&page=1
+   * Supports optional query params: ?genre=Acoustic&limit=30&page=1&source=live|local
    */
-  app.get('/api/trending', (req: Request, res: Response) => {
+  app.get('/api/trending', async (req: Request, res: Response) => {
     const genre = typeof req.query.genre === 'string' ? req.query.genre : '';
-    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : SAMPLE_CATALOG.length;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 30;
     const page = req.query.page ? Math.max(1, parseInt(req.query.page as string, 10)) : 1;
+    const source = req.query.source === 'local' ? 'local' : 'live';
 
-    let filtered = SAMPLE_CATALOG;
-    if (genre && genre !== 'All') {
-      filtered = filtered.filter(t => t.genre?.toLowerCase() === genre.toLowerCase());
+    let tracks = SAMPLE_CATALOG;
+    if (source === 'live') {
+      try {
+        tracks = await fetchLiveTrending(genre, limit * 2);
+      } catch (e) {
+        console.warn('Live trending fallback to local catalog:', e);
+      }
+    } else if (genre && genre !== 'All') {
+      tracks = tracks.filter(t => t.genre?.toLowerCase() === genre.toLowerCase());
     }
 
     const startIndex = (page - 1) * limit;
-    const paginated = filtered.slice(startIndex, startIndex + limit);
+    const paginated = tracks.slice(startIndex, startIndex + limit);
 
     return res.json({
       success: true,
-      total: filtered.length,
+      total: tracks.length,
       results: paginated
     });
   });
@@ -57,21 +65,29 @@ async function createServer() {
    * A. Search Tracks
    * Method: GET
    * Endpoint: /api/search?q={query}
-   * Example: /api/search?q=acoustic
-   * Supports optional query params: &limit=20&page=1
+   * Searches across 100M+ real tracks in progressive audio format
    */
-  app.get('/api/search', (req: Request, res: Response) => {
+  app.get('/api/search', async (req: Request, res: Response) => {
     const query = typeof req.query.q === 'string' ? req.query.q : '';
-    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 50;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 40;
     const page = req.query.page ? Math.max(1, parseInt(req.query.page as string, 10)) : 1;
+    const source = req.query.source === 'local' ? 'local' : 'live';
 
-    const allResults = searchTracksInCatalog(SAMPLE_CATALOG, query);
+    let results = [];
+    if (!query.trim()) {
+      results = await fetchLiveTrending('Acoustic', limit);
+    } else if (source === 'local') {
+      results = searchTracksInCatalog(SAMPLE_CATALOG, query);
+    } else {
+      results = await fetchLiveMusicSearch(query, limit * 2);
+    }
+
     const startIndex = (page - 1) * limit;
-    const paginated = allResults.slice(startIndex, startIndex + limit);
+    const paginated = results.slice(startIndex, startIndex + limit);
 
     return res.json({
       success: true,
-      total: allResults.length,
+      total: results.length,
       results: paginated
     });
   });

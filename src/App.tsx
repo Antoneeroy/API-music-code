@@ -153,12 +153,13 @@ const MainContent: React.FC = () => {
                 <h1 className="text-base font-bold tracking-tight text-white leading-none">
                   SoundWave
                 </h1>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                  Free CDN API
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>100M+ Live Songs</span>
                 </span>
               </div>
               <p className="text-[11px] text-neutral-400 leading-none mt-1">
-                Direct Legal Streaming · ₹0 Cost
+                Direct Legal Streaming · ₹0 Bandwidth Cost
               </p>
             </div>
           </div>
@@ -387,9 +388,9 @@ const MainContent: React.FC = () => {
             </div>
 
             {/* Quick Query Pills */}
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-neutral-500">Quick Searches:</span>
-              {['acoustic', 'lo-fi', 'electronic', 'ambient', 'guitar', 'piano'].map(q => (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-neutral-500">Live 100M+ Catalog Searches:</span>
+              {['Arijit Singh', 'Diljit Dosanjh', 'Acoustic', 'Taylor Swift', 'Lo-Fi', 'Bollywood', 'Punjabi', 'Synthwave', 'Chopin'].map(q => (
                 <button
                   key={q}
                   type="button"
