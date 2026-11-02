@@ -1,30 +1,79 @@
+import CryptoJS from 'crypto-js';
 import { Track } from '../types/music.ts';
 import { SAMPLE_CATALOG, searchTracksInCatalog } from '../utils/musicApi.ts';
 
-// In-memory cache to avoid repeated queries and achieve sub-5ms responses
+// In-memory cache for fast sub-5ms responses
 const cache = new Map<string, { timestamp: number; tracks: Track[] }>();
-const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutes
+const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes cache
 
-interface ITunesResult {
-  trackId?: number;
-  collectionId?: number;
-  trackName?: string;
-  collectionName?: string;
-  artistName?: string;
-  trackTimeMillis?: number;
-  artworkUrl100?: string;
-  artworkUrl600?: string;
-  previewUrl?: string;
-  primaryGenreName?: string;
+// JioSaavn DES encryption key (publicly known DES-ECB key)
+const SAAVN_DES_KEY = CryptoJS.enc.Utf8.parse('38346591');
+
+/**
+ * Decrypts JioSaavn encrypted media URL into direct progressive CDN streaming URL.
+ * Produces 100% FULL-LENGTH songs (not 30-second previews).
+ */
+export function decryptSaavnMediaUrl(encryptedUrl?: string): string | null {
+  if (!encryptedUrl || typeof encryptedUrl !== 'string') return null;
+  try {
+    const decrypted = CryptoJS.DES.decrypt(
+      CryptoJS.lib.CipherParams.create({
+        ciphertext: CryptoJS.enc.Base64.parse(encryptedUrl.trim())
+      }),
+      SAAVN_DES_KEY,
+      { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 }
+    );
+    const rawUrl = decrypted.toString(CryptoJS.enc.Utf8);
+    if (!rawUrl || !rawUrl.startsWith('http')) return null;
+
+    // Use 160kbps high quality audio for fast buffering and rich audio fidelity
+    return rawUrl.replace('_96.mp4', '_160.mp4').replace('_48.mp4', '_160.mp4');
+  } catch (err) {
+    console.warn('Failed to decrypt media URL:', err);
+    return null;
+  }
 }
 
 /**
- * Fetch tracks from the 100 Million+ Public Progressive Music Index
+ * Clean HTML entity encoding e.g. &quot; -> ", &amp; -> &
+ */
+function decodeHtmlEntities(str?: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .trim();
+}
+
+/**
+ * JioSaavn Raw Search Item Interface
+ */
+interface SaavnRawSong {
+  id: string;
+  title: string;
+  image?: string;
+  language?: string;
+  more_info?: {
+    duration?: string;
+    album?: string;
+    encrypted_media_url?: string;
+    artistMap?: {
+      primary_artists?: Array<{ name: string }>;
+      artists?: Array<{ name: string; role?: string }>;
+    };
+  };
+}
+
+/**
+ * Fetch 100% FULL-LENGTH songs across Hindi, Bhojpuri, Bollywood, Punjabi, and Regional Music
  */
 export async function fetchLiveMusicSearch(query: string, limit: number = 30): Promise<Track[]> {
   const clean = query.trim();
   if (!clean) {
-    return SAMPLE_CATALOG;
+    return fetchLiveTrending('All', limit);
   }
 
   const cacheKey = `search:${clean.toLowerCase()}:${limit}`;
@@ -33,130 +82,111 @@ export async function fetchLiveMusicSearch(query: string, limit: number = 30): P
     return cached.tracks;
   }
 
+  const tracks: Track[] = [];
+
   try {
-    const encoded = encodeURIComponent(clean);
-    // Public Apple/iTunes search index with progressive streaming CDN URLs
-    const url = `https://itunes.apple.com/search?term=${encoded}&entity=song&limit=${limit}`;
-    const response = await fetch(url, {
+    // 1. Query JioSaavn for 100% FULL-LENGTH songs (Hindi, Bhojpuri, Bollywood, Punjabi, etc.)
+    const saavnUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(
+      clean
+    )}&p=1&n=${limit}&_format=json&_marker=0&api_version=4&ctx=android`;
+
+    const res = await fetch(saavnUrl, {
       headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'SoundWaveMusic/1.0'
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36'
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`Public Music API returned status ${response.status}`);
-    }
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.results)) {
+        for (const item of data.results as SaavnRawSong[]) {
+          const encUrl = item.more_info?.encrypted_media_url;
+          const streamUrl = decryptSaavnMediaUrl(encUrl);
+          if (!streamUrl) continue;
 
-    const data = await response.json();
-    const liveTracks: Track[] = [];
+          // Parse primary artists
+          const primaryArtists = item.more_info?.artistMap?.primary_artists?.map(a => a.name) || [];
+          const artistName = primaryArtists.length > 0
+            ? primaryArtists.join(', ')
+            : (item.more_info?.artistMap?.artists?.map(a => a.name).join(', ') || 'Various Artists');
 
-    if (Array.isArray(data.results)) {
-      for (const item of data.results as ITunesResult[]) {
-        if (!item.previewUrl || !item.trackName || !item.artistName) continue;
+          // High-res 500x500 album art
+          const artwork = item.image
+            ? item.image.replace(/150x150/g, '500x500').replace(/50x50/g, '500x500')
+            : null;
 
-        // Obtain high-resolution 600x600 artwork
-        const highResArt = item.artworkUrl100
-          ? item.artworkUrl100.replace('100x100bb', '600x600bb')
-          : null;
+          const durationSeconds = item.more_info?.duration
+            ? parseInt(item.more_info.duration, 10)
+            : 210;
 
-        liveTracks.push({
-          id: String(item.trackId || Math.random().toString(36).substring(2, 9)),
-          title: item.trackName,
-          artist: item.artistName,
-          duration: item.trackTimeMillis ? Math.round(item.trackTimeMillis / 1000) : 180,
-          artwork: highResArt,
-          stream_url: item.previewUrl,
-          genre: item.primaryGenreName || 'Music',
-          album: item.collectionName || 'Single'
-        });
+          tracks.push({
+            id: `sn_${item.id}`,
+            title: decodeHtmlEntities(item.title),
+            artist: decodeHtmlEntities(artistName),
+            duration: durationSeconds,
+            artwork: artwork,
+            stream_url: streamUrl, // 100% FULL SONG CDN STREAM (NOT 30s preview)
+            genre: (item.language ? item.language.charAt(0).toUpperCase() + item.language.slice(1) : 'Music'),
+            album: decodeHtmlEntities(item.more_info?.album || 'Single')
+          });
+        }
       }
     }
+  } catch (err) {
+    console.warn('JioSaavn search query failed, checking local catalog:', err);
+  }
 
-    // Also include local matches if any
-    const localMatches = searchTracksInCatalog(SAMPLE_CATALOG, clean);
-    const combined = [...localMatches, ...liveTracks];
+  // Also include local matches if any
+  const localMatches = searchTracksInCatalog(SAMPLE_CATALOG, clean);
+  const combined = [...tracks, ...localMatches];
 
-    // Deduplicate by ID
-    const unique = Array.from(new Map(combined.map(t => [t.id, t])).values());
+  // Deduplicate by ID
+  const unique = Array.from(new Map(combined.map(t => [t.id, t])).values());
 
+  if (unique.length > 0) {
     cache.set(cacheKey, { timestamp: Date.now(), tracks: unique });
     return unique;
-  } catch (err) {
-    console.warn('Live music search failed, falling back to local catalog:', err);
-    return searchTracksInCatalog(SAMPLE_CATALOG, clean);
   }
+
+  return localMatches;
 }
 
 /**
- * Fetch live trending tracks across popular categories
+ * Fetch 100% Full-Length Trending Tracks (Bhojpuri Hits, Bollywood Hits, Punjabi, Lo-Fi)
  */
 export async function fetchLiveTrending(genre?: string, limit: number = 30): Promise<Track[]> {
-  const cacheKey = `trending:${genre || 'all'}:${limit}`;
+  const selectedGenre = genre || 'All';
+  const cacheKey = `trending:${selectedGenre.toLowerCase()}:${limit}`;
   const cached = cache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
     return cached.tracks;
   }
 
-  // Determine search seed based on genre
-  let searchSeed = 'top hits 2026';
-  if (genre && genre !== 'All') {
-    const genreMap: Record<string, string> = {
-      'Acoustic': 'acoustic guitar',
-      'Desi Acoustic': 'bollywood acoustic arijit',
-      'Lo-Fi': 'lofi beats chill',
-      'Electronic': 'electronic dance synthwave',
-      'Ambient': 'ambient meditation sleep',
-      'Classical': 'piano classical chopin',
-      'Funk': 'funk groove',
-      'Jazz': 'jazz cafe',
-      'Folk Fusion': 'punjabi folk fusion',
-      'Bollywood': 'arijit singh hits',
-      'Punjabi': 'diljit dosanjh'
-    };
-    searchSeed = genreMap[genre] || genre;
+  // Target query tailored for selected genre
+  let searchQuery = 'arijit singh superhit';
+  if (selectedGenre === 'Bhojpuri') {
+    searchQuery = 'pawan singh khesari lal bhojpuri hit';
+  } else if (selectedGenre === 'Hindi' || selectedGenre === 'Bollywood') {
+    searchQuery = 'arijit singh romantic hits';
+  } else if (selectedGenre === 'Punjabi') {
+    searchQuery = 'diljit dosanjh punjabi hits';
+  } else if (selectedGenre === 'Lo-Fi') {
+    searchQuery = 'lofi chai chill';
+  } else if (selectedGenre === 'Acoustic') {
+    searchQuery = 'acoustic guitar unplugged';
+  } else if (selectedGenre === 'All') {
+    searchQuery = 'top songs 2026';
   }
 
   try {
-    const encoded = encodeURIComponent(searchSeed);
-    const url = `https://itunes.apple.com/search?term=${encoded}&entity=song&limit=${limit}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    const liveTracks: Track[] = [];
-    if (Array.isArray(data.results)) {
-      for (const item of data.results as ITunesResult[]) {
-        if (!item.previewUrl || !item.trackName || !item.artistName) continue;
-        const highResArt = item.artworkUrl100
-          ? item.artworkUrl100.replace('100x100bb', '600x600bb')
-          : null;
-
-        liveTracks.push({
-          id: String(item.trackId || Math.random().toString(36).substring(2, 9)),
-          title: item.trackName,
-          artist: item.artistName,
-          duration: item.trackTimeMillis ? Math.round(item.trackTimeMillis / 1000) : 180,
-          artwork: highResArt,
-          stream_url: item.previewUrl,
-          genre: genre && genre !== 'All' ? genre : (item.primaryGenreName || 'Pop'),
-          album: item.collectionName || 'Trending'
-        });
-      }
+    const live = await fetchLiveMusicSearch(searchQuery, limit);
+    if (live.length > 0) {
+      cache.set(cacheKey, { timestamp: Date.now(), tracks: live });
+      return live;
     }
-
-    // Blend with curated sample catalog
-    const localFiltered = (!genre || genre === 'All')
-      ? SAMPLE_CATALOG
-      : SAMPLE_CATALOG.filter(t => t.genre?.toLowerCase() === genre.toLowerCase());
-
-    const blended = [...localFiltered, ...liveTracks];
-    const unique = Array.from(new Map(blended.map(t => [t.id, t])).values());
-
-    cache.set(cacheKey, { timestamp: Date.now(), tracks: unique });
-    return unique;
   } catch (err) {
-    console.warn('Failed to fetch live trending, returning local catalog:', err);
-    return SAMPLE_CATALOG;
+    console.warn('Failed to fetch trending, falling back to sample catalog:', err);
   }
+
+  return SAMPLE_CATALOG;
 }

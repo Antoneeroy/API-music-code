@@ -116,8 +116,8 @@ const MainContent: React.FC = () => {
     };
   }, [debouncedValue, apiBaseUrl]);
 
-  // Filter trending tracks by selected genre
-  const genres = ['All', 'Acoustic', 'Desi Acoustic', 'Lo-Fi', 'Electronic', 'Ambient', 'Classical', 'Funk', 'Jazz', 'Folk Fusion'];
+  // Filter trending tracks by selected genre (Featuring Bhojpuri, Hindi, Bollywood, Punjabi full songs)
+  const genres = ['All', 'Bhojpuri', 'Hindi', 'Bollywood', 'Punjabi', 'Lo-Fi', 'Acoustic', 'Electronic', 'Classical'];
   const filteredTrending = selectedGenre === 'All'
     ? trendingTracks
     : trendingTracks.filter(t => t.genre?.toLowerCase() === selectedGenre.toLowerCase());
@@ -155,11 +155,11 @@ const MainContent: React.FC = () => {
                 </h1>
                 <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>100M+ Live Songs</span>
+                  <span>100% Full Songs · Bhojpuri & Hindi</span>
                 </span>
               </div>
               <p className="text-[11px] text-neutral-400 leading-none mt-1">
-                Direct Legal Streaming · ₹0 Bandwidth Cost
+                Full-Length Akamai CDN Streams · ₹0 Server Cost
               </p>
             </div>
           </div>
@@ -389,8 +389,8 @@ const MainContent: React.FC = () => {
 
             {/* Quick Query Pills */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-neutral-500">Live 100M+ Catalog Searches:</span>
-              {['Arijit Singh', 'Diljit Dosanjh', 'Acoustic', 'Taylor Swift', 'Lo-Fi', 'Bollywood', 'Punjabi', 'Synthwave', 'Chopin'].map(q => (
+              <span className="text-neutral-500">Full Songs (Bhojpuri & Hindi):</span>
+              {['Pawan Singh', 'Khesari Lal', 'Arijit Singh', 'Bhojpuri Hit', 'Shilpi Raj', 'Diljit Dosanjh', 'Tum Hi Ho', 'Kesariya', 'Acoustic'].map(q => (
                 <button
                   key={q}
                   type="button"
