@@ -122,8 +122,18 @@ const MainContent: React.FC = () => {
     ? trendingTracks
     : trendingTracks.filter(t => t.genre?.toLowerCase() === selectedGenre.toLowerCase());
 
-  // Liked tracks list
-  const likedTracks = SAMPLE_CATALOG.filter(t => likedTrackIds.has(t.id));
+  // Aggregated all known tracks so any liked track from search, trending, or queue displays in library
+  const allKnownTracks = React.useMemo(() => {
+    const map = new Map<string, Track>();
+    SAMPLE_CATALOG.forEach(t => map.set(t.id, t));
+    trendingTracks.forEach(t => map.set(t.id, t));
+    searchResults.forEach(t => map.set(t.id, t));
+    if (currentTrack) map.set(currentTrack.id, currentTrack);
+    return Array.from(map.values());
+  }, [trendingTracks, searchResults, currentTrack]);
+
+  // Liked tracks list from all known tracks
+  const likedTracks = allKnownTracks.filter(t => likedTrackIds.has(t.id));
 
   // Featured track (e.g. first acoustic track)
   const heroTrack = trendingTracks[0] || SAMPLE_CATALOG[0];

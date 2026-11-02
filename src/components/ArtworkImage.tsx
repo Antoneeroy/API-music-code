@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Music2 } from 'lucide-react';
 
 interface ArtworkImageProps {
@@ -18,6 +18,12 @@ export const ArtworkImage: React.FC<ArtworkImageProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Reset state whenever artwork src changes
+  useEffect(() => {
+    setImageError(false);
+    setIsLoaded(false);
+  }, [src]);
 
   const iconSizes = {
     sm: 'w-4 h-4',

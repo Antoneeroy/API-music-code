@@ -45,17 +45,27 @@ export const PlayerBar: React.FC = () => {
     setIsExpanded
   } = usePlayer();
 
+  const [isScrubbing, setIsScrubbing] = React.useState(false);
+  const [scrubValue, setScrubValue] = React.useState(0);
+
   if (!currentTrack) {
     return null;
   }
 
   const isLiked = likedTrackIds.has(currentTrack.id);
   const trackDuration = duration || currentTrack.duration;
-  const progressPercent = trackDuration > 0 ? (currentTime / trackDuration) * 100 : 0;
+  const displayTime = isScrubbing ? scrubValue : currentTime;
+  const progressPercent = trackDuration > 0 ? (displayTime / trackDuration) * 100 : 0;
 
-  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeekInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
+    setScrubValue(val);
+  };
+
+  const handleSeekCommit = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    const val = parseFloat((e.target as HTMLInputElement).value);
     seek(val);
+    setIsScrubbing(false);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,15 +194,21 @@ export const PlayerBar: React.FC = () => {
           {/* Seekbar */}
           <div className="w-full flex items-center gap-2.5 text-xs text-neutral-400 font-mono">
             <span className="w-9 text-right text-[11px] tabular-nums select-none">
-              {formatDuration(currentTime)}
+              {formatDuration(displayTime)}
             </span>
             <div className="relative flex-1 flex items-center group cursor-pointer py-1">
               <input
                 type="range"
                 min={0}
                 max={trackDuration || 100}
-                value={currentTime}
-                onChange={handleSeekChange}
+                value={displayTime}
+                onChange={handleSeekInput}
+                onPointerDown={() => {
+                  setIsScrubbing(true);
+                  setScrubValue(currentTime);
+                }}
+                onPointerUp={handleSeekCommit}
+                onKeyUp={handleSeekCommit}
                 aria-label="Seek track position"
                 className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-amber-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                 style={{

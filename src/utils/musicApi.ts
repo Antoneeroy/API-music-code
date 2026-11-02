@@ -1,4 +1,4 @@
-import { ApiResponse, Track } from '../types/music.ts';
+import type { ApiResponse, Track } from '../types/music.ts';
 
 /**
  * Curated catalog of legal progressive streaming tracks.
@@ -150,7 +150,7 @@ export const SAMPLE_CATALOG: Track[] = [
     title: 'Nocturne in C-Sharp Minor',
     artist: 'Chopin Ensemble',
     duration: 290,
-    artwork: 'https://images.unsplash.com/photo-1520523839898-507121c17228?w=500&auto=format&fit=crop&q=80',
+    artwork: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=500&auto=format&fit=crop&q=80',
     stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3',
     genre: 'Classical',
     album: 'Masterworks Anthology'

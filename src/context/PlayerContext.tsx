@@ -247,9 +247,15 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const seek = (seconds: number) => {
+    setCurrentTime(seconds);
     if (audioRef.current) {
-      audioRef.current.currentTime = seconds;
-      setCurrentTime(seconds);
+      try {
+        if (audioRef.current.readyState >= 1) {
+          audioRef.current.currentTime = seconds;
+        }
+      } catch (err) {
+        console.warn('Seek deferred until audio metadata loaded:', err);
+      }
     }
   };
 

@@ -48,6 +48,8 @@ export const ExpandedPlayer: React.FC = () => {
   } = usePlayer();
 
   const [copiedStream, setCopiedStream] = React.useState(false);
+  const [isScrubbing, setIsScrubbing] = React.useState(false);
+  const [scrubValue, setScrubValue] = React.useState(0);
 
   // Close on Escape key
   useEffect(() => {
@@ -64,7 +66,19 @@ export const ExpandedPlayer: React.FC = () => {
 
   const isLiked = likedTrackIds.has(currentTrack.id);
   const trackDuration = duration || currentTrack.duration;
-  const progressPercent = trackDuration > 0 ? (currentTime / trackDuration) * 100 : 0;
+  const displayTime = isScrubbing ? scrubValue : currentTime;
+  const progressPercent = trackDuration > 0 ? (displayTime / trackDuration) * 100 : 0;
+
+  const handleSeekInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setScrubValue(val);
+  };
+
+  const handleSeekCommit = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    const val = parseFloat((e.target as HTMLInputElement).value);
+    seek(val);
+    setIsScrubbing(false);
+  };
 
   const handleCopyStream = () => {
     navigator.clipboard.writeText(currentTrack.stream_url);
@@ -192,8 +206,14 @@ export const ExpandedPlayer: React.FC = () => {
               type="range"
               min={0}
               max={trackDuration || 100}
-              value={currentTime}
-              onChange={e => seek(parseFloat(e.target.value))}
+              value={displayTime}
+              onChange={handleSeekInput}
+              onPointerDown={() => {
+                setIsScrubbing(true);
+                setScrubValue(currentTime);
+              }}
+              onPointerUp={handleSeekCommit}
+              onKeyUp={handleSeekCommit}
               aria-label="Seek track"
               className="w-full h-2 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-amber-500 focus:outline-none"
               style={{
@@ -202,7 +222,7 @@ export const ExpandedPlayer: React.FC = () => {
             />
           </div>
           <div className="flex justify-between text-xs font-mono text-neutral-400 select-none">
-            <span>{formatDuration(currentTime)}</span>
+            <span>{formatDuration(displayTime)}</span>
             <span>{formatDuration(trackDuration)}</span>
           </div>
         </div>
