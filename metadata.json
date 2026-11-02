@@ -1,0 +1,6 @@
+{
+  "name": "SoundWave - Music Streaming & API Hub",
+  "description": "High-performance music streaming web application and developer API hub featuring debounced track search, trending audio feeds, responsive playback player with audio visualizer, and Android Media3/Retrofit integration tooling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
