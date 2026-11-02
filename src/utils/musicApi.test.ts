@@ -19,12 +19,12 @@ test('formatDuration converts seconds to mm:ss format accurately', () => {
 });
 
 test('searchTracksInCatalog filters tracks correctly by title, artist, and genre', () => {
-  const acousticResults = searchTracksInCatalog(SAMPLE_CATALOG, 'acoustic');
-  assert.ok(acousticResults.length >= 2, 'Should find at least 2 acoustic tracks');
+  const bhojpuriResults = searchTracksInCatalog(SAMPLE_CATALOG, 'bhojpuri');
+  assert.ok(bhojpuriResults.length >= 2, 'Should find at least 2 Bhojpuri tracks');
 
-  const artistResults = searchTracksInCatalog(SAMPLE_CATALOG, 'Benjamin');
-  assert.equal(artistResults.length, 1);
-  assert.equal(artistResults[0].id, 'D7Ky5');
+  const artistResults = searchTracksInCatalog(SAMPLE_CATALOG, 'Pawan Singh');
+  assert.ok(artistResults.length >= 1, 'Should find Pawan Singh tracks');
+  assert.ok(artistResults[0].id.includes('pawan'));
 
   const emptyQueryResults = searchTracksInCatalog(SAMPLE_CATALOG, '   ');
   assert.equal(emptyQueryResults.length, SAMPLE_CATALOG.length);

@@ -6,164 +6,124 @@ import type { ApiResponse, Track } from '../types/music.ts';
  */
 export const SAMPLE_CATALOG: Track[] = [
   {
-    id: 'D7Ky5',
-    title: 'Acoustic Breeze',
-    artist: 'Benjamin Tissot',
-    duration: 157,
-    artwork: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    genre: 'Acoustic',
-    album: 'Sunlight Morning'
+    id: 'sn_pawan_sorry',
+    title: 'Sorry Sorry',
+    artist: 'Pawan Singh',
+    duration: 151,
+    artwork: 'https://c.saavncdn.com/936/Bhojpuriya-Raja-Bhojpuri-2016-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/936/910eed4451c290f342100823b7b80bbb_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Bhojpuriya Raja'
   },
   {
-    id: 'Tr89a',
-    title: 'Sunset Horizon',
-    artist: 'Acoustic Waves',
-    duration: 210,
-    artwork: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    genre: 'Acoustic',
-    album: 'Endless Coast'
-  },
-  {
-    id: 'Np23b',
-    title: 'Midnight Lo-Fi Echoes',
-    artist: 'Komorebi Sound',
-    duration: 184,
-    artwork: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    genre: 'Lo-Fi',
-    album: 'City Rain Tape'
-  },
-  {
-    id: 'Zk91m',
-    title: 'Neon Skyline',
-    artist: 'Synthetix Beats',
-    duration: 245,
-    artwork: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    genre: 'Electronic',
-    album: 'Cyber District'
-  },
-  {
-    id: 'Pl45x',
-    title: 'Deep Meditation Pulse',
-    artist: 'Aura Collective',
-    duration: 312,
-    artwork: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-    genre: 'Ambient',
-    album: 'Zenith Space'
-  },
-  {
-    id: 'Nu09q',
-    title: 'Midnight Coffee',
-    artist: 'Chillhop District',
-    duration: 198,
-    artwork: null, // Null artwork placeholder test
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-    genre: 'Chillout',
-    album: 'Study Session vol. 4'
-  },
-  {
-    id: 'Gv77t',
-    title: 'Guitar Reverie',
-    artist: 'Elena Rostova',
+    id: 'sn_khesari_palang',
+    title: 'Palang Sagwan Ke',
+    artist: 'Khesari Lal Yadav, Indu Sonali',
     duration: 224,
-    artwork: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-    genre: 'Acoustic',
-    album: 'Strings in the Dark'
+    artwork: 'https://c.saavncdn.com/431/Palang-Sagwan-Ke-From-Doli-Saja-Ke-Rakhna-Bhojpuri-2022-20220827101113-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/431/0f7118b2556ba75e482135f493faf0be_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Doli Saja Ke Rakhna'
   },
   {
-    id: 'Xw12y',
-    title: 'Starlight Voyage',
-    artist: 'Cosmo Beats',
-    duration: 270,
-    artwork: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
-    genre: 'Electronic',
-    album: 'Nebula Voyage'
+    id: 'sn_pawan_chhalakata',
+    title: 'Chhalakata Hamro Jawaniya',
+    artist: 'Pawan Singh, Priyanka Singh',
+    duration: 239,
+    artwork: 'https://c.saavncdn.com/436/Chhalakata-Hamro-Jawaniya-Bhojpuri-2016-20260420220308-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/436/8045f766bbdff243aee586cee7cde55e_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Bhojpuriya Raja'
   },
   {
-    id: 'Qm88r',
-    title: 'Velvet Raindrops',
-    artist: 'Piano Sanctuary',
-    duration: 165,
-    artwork: null, // Null artwork placeholder test
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3',
-    genre: 'Classical',
-    album: 'Solitude Solos'
+    id: 'sn_arijit_tum_hi_ho',
+    title: 'Tum Hi Ho',
+    artist: 'Arijit Singh, Mithoon',
+    duration: 261,
+    artwork: 'https://c.saavncdn.com/346/Aashiqui-2-Hindi-2013-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/346/a8a1005b822452296d999e289bfdc22d_160.mp4',
+    genre: 'Hindi',
+    album: 'Aashiqui 2'
   },
   {
-    id: 'Bt34p',
-    title: 'Urban Groove',
-    artist: 'Metro Funk Collective',
-    duration: 232,
-    artwork: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
-    genre: 'Funk',
-    album: 'Downtown Lights'
+    id: 'sn_pawan_lollypop',
+    title: 'Lolly Pop Lageli',
+    artist: 'Pawan Singh',
+    duration: 362,
+    artwork: 'https://c.saavncdn.com/814/Lolly-Pop-Lageli-Bhojpuri-2015-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/814/7b63fba0c7bb0b85a3c94f1c1f28b4c9_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Lolly Pop Lageli'
   },
   {
-    id: 'Ds01k',
-    title: 'Sufi Soul Acoustic',
-    artist: 'Kabir & The Strings',
+    id: 'sn_arijit_kesariya',
+    title: 'Kesariya',
+    artist: 'Arijit Singh, Pritam',
     duration: 268,
-    artwork: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3',
-    genre: 'Desi Acoustic',
-    album: 'Rooh Safar'
+    artwork: 'https://c.saavncdn.com/807/Brahmastra-Hindi-2022-20221006155928-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/807/04e1ecbe0bc5f6227b68b7ca89e246cf_160.mp4',
+    genre: 'Hindi',
+    album: 'Brahmastra'
   },
   {
-    id: 'Fl44m',
-    title: 'Monsoon Chai Lofi',
-    artist: 'Mumbai Lo-Fi Club',
-    duration: 175,
-    artwork: 'https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3',
-    genre: 'Lo-Fi',
-    album: 'Bandra Balcony Tapes'
+    id: 'sn_khesari_sajke',
+    title: 'Saj Ke Sawar Ke',
+    artist: 'Khesari Lal Yadav, Priyanka Singh',
+    duration: 168,
+    artwork: 'https://c.saavncdn.com/389/Muqaddar-Bhojpuri-2017-20171120-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/389/54e48810787329fe792d4f58c7041ca4_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Muqaddar'
   },
   {
-    id: 'Rk82a',
-    title: 'Punjab Folk Fusion',
-    artist: 'Rhythm of Dhol',
+    id: 'sn_diljit_lover',
+    title: 'Lover',
+    artist: 'Diljit Dosanjh',
+    duration: 185,
+    artwork: 'https://c.saavncdn.com/973/MoonChild-Era-Punjabi-2021-20210822101344-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/973/80004ad7ba16474fb85ca6621ee161f3_160.mp4',
+    genre: 'Punjabi',
+    album: 'MoonChild Era'
+  },
+  {
+    id: 'sn_jubin_raataan',
+    title: 'Raataan Lambiyan',
+    artist: 'Tanishk Bagchi, Jubin Nautiyal, Asees Kaur',
+    duration: 230,
+    artwork: null, // Null artwork placeholder test (matches spec)
+    stream_url: 'https://aac.saavncdn.com/238/Shershaah-Hindi-2021-20210815114751-160.mp4',
+    genre: 'Hindi',
+    album: 'Shershaah'
+  },
+  {
+    id: 'sn_arijit_agar_tum',
+    title: 'Agar Tum Saath Ho',
+    artist: 'Alka Yagnik, Arijit Singh, A.R. Rahman',
+    duration: 341,
+    artwork: 'https://c.saavncdn.com/747/Tamasha-Hindi-2015-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/747/b9e28bfbc7ebf0da0d691e84d4fa7df7_160.mp4',
+    genre: 'Hindi',
+    album: 'Tamasha'
+  },
+  {
+    id: 'sn_diljit_born_shine',
+    title: 'Born to Shine',
+    artist: 'Diljit Dosanjh',
+    duration: 214,
+    artwork: 'https://c.saavncdn.com/708/G-O-A-T--Punjabi-2020-20200729185207-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/708/bb94ae234ff60b6aebead5c90cf1923e_160.mp4',
+    genre: 'Punjabi',
+    album: 'G.O.A.T.'
+  },
+  {
+    id: 'sn_pawan_pudina',
+    title: 'Pudina Ae Haseena',
+    artist: 'Pawan Singh, Anupama Yadav',
     duration: 215,
-    artwork: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3',
-    genre: 'Folk Fusion',
-    album: 'Desi Roots'
-  },
-  {
-    id: 'Sy55w',
-    title: 'Synthwave Highway 84',
-    artist: 'Retro Horizon',
-    duration: 242,
-    artwork: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3',
-    genre: 'Electronic',
-    album: 'Neon Drive'
-  },
-  {
-    id: 'Cl19z',
-    title: 'Nocturne in C-Sharp Minor',
-    artist: 'Chopin Ensemble',
-    duration: 290,
-    artwork: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3',
-    genre: 'Classical',
-    album: 'Masterworks Anthology'
-  },
-  {
-    id: 'Jz33d',
-    title: 'Late Night Espresso Jazz',
-    artist: 'Blue Note Trio',
-    duration: 218,
-    artwork: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=500&auto=format&fit=crop&q=80',
-    stream_url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3',
-    genre: 'Jazz',
-    album: 'Rainy Cafe Session'
+    artwork: 'https://c.saavncdn.com/732/Pudina-Ae-Haseena-Bhojpuri-2021-20210604113038-500x500.webp',
+    stream_url: 'https://aac.saavncdn.com/732/df7a9fcda53a29094fe5b61b2c4587c4_160.mp4',
+    genre: 'Bhojpuri',
+    album: 'Pudina Ae Haseena'
   }
 ];
 
